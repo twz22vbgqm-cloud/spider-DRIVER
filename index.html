@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>spiderDRIVER — детейлинг-студия в Саянске</title>
+<meta name="description" content="spiderDRIVER — профессиональный детейлинг автомобилей в Саянске. Химчистка, полировка, керамика, защита кузова.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a0a0b;
+    --bg-soft: #131315;
+    --panel: #17171a;
+    --panel-line: #232327;
+    --thread: #9aa0a8;
+    --thread-dim: #3a3b3f;
+    --ink: #f3f2ee;
+    --ink-dim: #8d9097;
+    --venom: #e8423f;
+    --venom-soft: #ff6b58;
+    --resin: #c9a13a;
+    --radius: 2px;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  ::selection{ background:var(--venom); color:#0a0a0b; }
+
+  a{color:inherit;text-decoration:none;}
+
+  .mono{
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+
+  .display{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.01em;
+  }
+
+  /* ---------- THREAD CANVAS (signature) ---------- */
+  #thread-canvas{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    opacity:0.55;
+  }
+
+  .noise{
+    position:fixed;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    opacity:0.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .wrap{
+    position:relative;
+    z-index:2;
+  }
+
+  .container{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 32px;
+  }
+
+  /* ---------- NAV ---------- */
+  header{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:rgba(10,10,11,0.82);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--panel-line);
+  }
+  nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 32px;
+    max-width:1180px;
+    margin:0 auto;
+  }
+  .logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Oswald',sans-serif;
+    font-weight:600;
+    font-size:1.15rem;
+    letter-spacing:0.02em;
+  }
+  .logo-mark{
+    width:22px;height:22px;
+    position:relative;
+    flex-shrink:0;
+  }
+  .logo span.accent{color:var(--venom);}
+  .nav-links{
+    display:flex;
+    gap:32px;
+    font-size:0.84rem;
+  }
+  .nav-links a{
+    color:var(--ink-dim);
+    transition:color .25s;
+    position:relative;
+  }
+  .nav-links a:hover{color:var(--ink);}
+  .nav-cta{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.78rem;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    border:1px solid var(--venom);
+    color:var(--venom);
+    padding:9px 18px;
+    border-radius:var(--radius);
+    transition:all .25s;
+  }
+  .nav-cta:hover{background:var(--venom);color:#0a0a0b;}
+
+  .nav-toggle{display:none;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height:92vh;
+    display:flex;
+    align-items:center;
+    position:relative;
+    padding:80px 0 60px;
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns:1.1fr 0.7fr;
+    gap:60px;
+    align-items:center;
+  }
+  .eyebrow{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.78rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--venom-soft);
+    margin-bottom:28px;
+  }
+  .eyebrow::before{
+    content:'';
+    width:7px;height:7px;
+    background:var(--venom);
+    border-radius:50%;
+    box-shadow:0 0 12px var(--venom);
+    animation:pulse 2.2s infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1;}
+    50%{opacity:0.35;}
+  }
+  h1{
+    font-family:'Oswald',sans-serif;
+    font-weight:700;
+    font-size:clamp(2.6rem, 5.6vw, 4.6rem);
+    line-height:1.02;
+    letter-spacing:-0.01em;
+    text-transform:uppercase;
+    margin-bottom:26px;
+  }
+  h1 .line2{color:var(--ink-dim);}
+  .hero-sub{
+    font-size:1.05rem;
+    line-height:1.65;
+    color:var(--ink-dim);
+    max-width:480px;
+    margin-bottom:38px;
+  }
+  .hero-actions{
+    display:flex;
+    gap:16px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  .btn-primary{
+    background:var(--venom);
+    color:#0a0a0b;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.85rem;
+    font-weight:500;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    padding:16px 30px;
+    border-radius:var(--radius);
+    border:1px solid var(--venom);
+    cursor:pointer;
+    transition:all .25s;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+  }
+  .btn-primary:hover{
+    background:transparent;
+    color:var(--venom);
+    box-shadow:0 0 0 1px var(--venom);
+  }
+  .btn-ghost{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.85rem;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    padding:16px 6px;
+    border-bottom:1px solid var(--thread-dim);
+    transition:all .25s;
+  }
+  .btn-ghost:hover{color:var(--ink);border-color:var(--ink-dim);}
+
+  .hero-stats{
+    display:flex;
+    gap:34px;
+    margin-top:56px;
+  }
+  .stat-num{
+    font-family:'Oswald',sans-serif;
+    font-size:2.1rem;
+    font-weight:600;
+    color:var(--ink);
+    line-height:1;
+  }
+  .stat-label{
+    font-size:0.78rem;
+    color:var(--ink-dim);
+    margin-top:6px;
+    max-width:120px;
+    line-height:1.3;
+  }
+
+  /* hero visual: web rig */
+  .hero-visual{
+    position:relative;
+    aspect-ratio:1/1.05;
+  }
+  .web-rig{width:100%;height:100%;}
+
+  /* ---------- SECTION GENERIC ---------- */
+  section{
+    position:relative;
+    padding:120px 0;
+    border-top:1px solid var(--panel-line);
+  }
+  .section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:40px;
+    margin-bottom:64px;
+    flex-wrap:wrap;
+  }
+  .section-tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.78rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--venom-soft);
+    display:block;
+    margin-bottom:14px;
+  }
+  .section-title{
+    font-family:'Oswald',sans-serif;
+    font-weight:600;
+    text-transform:uppercase;
+    font-size:clamp(1.8rem,3.4vw,2.6rem);
+    letter-spacing:0;
+    max-width:600px;
+  }
+  .section-note{
+    color:var(--ink-dim);
+    max-width:320px;
+    font-size:0.94rem;
+    line-height:1.6;
+  }
+
+  /* ---------- SERVICES ---------- */
+  .services-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1px;
+    background:var(--panel-line);
+    border:1px solid var(--panel-line);
+  }
+  .service-card{
+    background:var(--bg);
+    padding:38px 32px;
+    transition:background .3s;
+    position:relative;
+  }
+  .service-card:hover{background:var(--panel);}
+  .service-num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.78rem;
+    color:var(--thread-dim);
+    margin-bottom:24px;
+    display:block;
+  }
+  .service-card h3{
+    font-family:'Oswald',sans-serif;
+    font-size:1.25rem;
+    text-transform:uppercase;
+    font-weight:600;
+    margin-bottom:14px;
+  }
+  .service-card p{
+    color:var(--ink-dim);
+    font-size:0.92rem;
+    line-height:1.6;
+    margin-bottom:20px;
+  }
+  .service-price{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.85rem;
+    color:var(--venom-soft);
+    display:flex;
+    justify-content:space-between;
+    border-top:1px solid var(--panel-line);
+    padding-top:16px;
+  }
+
+  /* ---------- PROCESS ---------- */
+  .process-rail{
+    display:flex;
+    flex-direction:column;
+  }
+  .process-step{
+    display:grid;
+    grid-template-columns:90px 1fr 1fr;
+    gap:30px;
+    padding:30px 0;
+    border-top:1px solid var(--panel-line);
+    align-items:center;
+  }
+  .process-step:last-child{border-bottom:1px solid var(--panel-line);}
+  .process-id{
+    font-family:'Oswald',sans-serif;
+    font-size:2.4rem;
+    color:var(--thread-dim);
+    font-weight:600;
+    transition:color .3s;
+  }
+  .process-step:hover .process-id{color:var(--venom);}
+  .process-name{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    font-size:1.15rem;
+    font-weight:500;
+  }
+  .process-desc{
+    color:var(--ink-dim);
+    font-size:0.92rem;
+    line-height:1.55;
+  }
+
+  /* ---------- BEFORE/AFTER STRIP ---------- */
+  .strip{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1px;
+    background:var(--panel-line);
+    border:1px solid var(--panel-line);
+  }
+  .strip-cell{
+    background:var(--bg);
+    aspect-ratio:3/4;
+    position:relative;
+    overflow:hidden;
+  }
+  .strip-cell .tex{
+    position:absolute;inset:0;
+    background:
+      repeating-linear-gradient(115deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 7px),
+      linear-gradient(160deg, #1c1c1f 0%, #0a0a0b 70%);
+  }
+  .strip-cell .glint{
+    position:absolute;
+    width:140%;height:40%;
+    background:linear-gradient(100deg, transparent, rgba(232,66,63,0.18), transparent);
+    top:30%;left:-20%;
+    transform:rotate(-8deg);
+  }
+  .strip-cell .label{
+    position:absolute;
+    bottom:14px;left:14px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    color:var(--ink-dim);
+    letter-spacing:0.05em;
+  }
+
+  /* ---------- WHY / TRUST ---------- */
+  .trust-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:40px;
+  }
+  .trust-item{
+    border-left:1px solid var(--thread-dim);
+    padding-left:20px;
+  }
+  .trust-item .ic{
+    width:34px;height:34px;
+    margin-bottom:18px;
+    stroke:var(--venom-soft);
+  }
+  .trust-item h4{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    font-size:1rem;
+    margin-bottom:10px;
+    letter-spacing:0.02em;
+  }
+  .trust-item p{
+    color:var(--ink-dim);
+    font-size:0.88rem;
+    line-height:1.55;
+  }
+
+  /* ---------- LOCATION ---------- */
+  .loc-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:60px;
+    align-items:stretch;
+  }
+  .loc-info{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:26px;
+  }
+  .loc-row{
+    display:flex;
+    gap:18px;
+    align-items:flex-start;
+    padding-bottom:22px;
+    border-bottom:1px solid var(--panel-line);
+  }
+  .loc-row:last-child{border-bottom:none;padding-bottom:0;}
+  .loc-row .ic{
+    width:20px;height:20px;
+    stroke:var(--venom-soft);
+    flex-shrink:0;
+    margin-top:3px;
+  }
+  .loc-row .loc-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    margin-bottom:6px;
+  }
+  .loc-row .loc-val{
+    font-size:1rem;
+    line-height:1.5;
+  }
+  .map-frame{
+    position:relative;
+    border:1px solid var(--panel-line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    min-height:380px;
+  }
+  .map-frame iframe{
+    width:100%;height:100%;
+    min-height:380px;
+    border:0;
+    filter:grayscale(0.4) invert(0.92) contrast(0.86);
+  }
+
+  /* ---------- FORM SECTION ---------- */
+  .form-section{
+    background:
+      radial-gradient(circle at 15% 20%, rgba(232,66,63,0.06), transparent 45%),
+      var(--bg-soft);
+  }
+  .form-wrap{
+    display:grid;
+    grid-template-columns:0.85fr 1.15fr;
+    gap:0;
+    border:1px solid var(--panel-line);
+    background:var(--panel);
+  }
+  .form-aside{
+    padding:56px 48px;
+    border-right:1px solid var(--panel-line);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+  }
+  .form-aside h2{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    font-size:1.9rem;
+    line-height:1.15;
+    margin-bottom:18px;
+  }
+  .form-aside p{
+    color:var(--ink-dim);
+    font-size:0.94rem;
+    line-height:1.65;
+    margin-bottom:30px;
+  }
+  .form-aside .telegram-note{
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    padding:18px;
+    border:1px solid var(--panel-line);
+    border-radius:var(--radius);
+    background:rgba(255,255,255,0.015);
+  }
+  .telegram-note .ic{
+    width:22px;height:22px;
+    stroke:#2ea6e0;
+    flex-shrink:0;
+  }
+  .telegram-note span{
+    font-size:0.82rem;
+    color:var(--ink-dim);
+    line-height:1.5;
+  }
+  .form-body{
+    padding:56px 48px;
+  }
+  .field{
+    margin-bottom:22px;
+  }
+  .field label{
+    display:block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.74rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    margin-bottom:10px;
+  }
+  .field .req{color:var(--venom-soft);}
+  .field input{
+    width:100%;
+    background:var(--bg);
+    border:1px solid var(--panel-line);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:0.98rem;
+    padding:15px 16px;
+    border-radius:var(--radius);
+    transition:border-color .25s, box-shadow .25s;
+  }
+  .field input::placeholder{color:var(--thread-dim);}
+  .field input:focus{
+    outline:none;
+    border-color:var(--venom);
+    box-shadow:0 0 0 3px rgba(232,66,63,0.12);
+  }
+  .field-hint{
+    font-size:0.76rem;
+    color:var(--thread-dim);
+    margin-top:7px;
+  }
+  .field.has-error input{ border-color: var(--venom); }
+  .field .error-msg{
+    font-size:0.76rem;
+    color:var(--venom-soft);
+    margin-top:7px;
+    display:none;
+  }
+  .field.has-error .error-msg{display:block;}
+
+  .form-submit{
+    width:100%;
+    background:var(--venom);
+    color:#0a0a0b;
+    border:1px solid var(--venom);
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.88rem;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    padding:17px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    transition:all .25s;
+    margin-top:8px;
+  }
+  .form-submit:hover{background:var(--venom-soft);border-color:var(--venom-soft);}
+  .form-submit:disabled{opacity:0.55;cursor:not-allowed;}
+
+  .form-status{
+    margin-top:16px;
+    font-size:0.86rem;
+    font-family:'JetBrains Mono',monospace;
+    display:none;
+    padding:13px 14px;
+    border-radius:var(--radius);
+  }
+  .form-status.show{display:block;}
+  .form-status.ok{
+    background:rgba(80,200,120,0.08);
+    border:1px solid rgba(80,200,120,0.35);
+    color:#7fd99a;
+  }
+  .form-status.err{
+    background:rgba(232,66,63,0.08);
+    border:1px solid rgba(232,66,63,0.35);
+    color:var(--venom-soft);
+  }
+
+  .consent{
+    font-size:0.76rem;
+    color:var(--thread-dim);
+    line-height:1.5;
+    margin-top:18px;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    padding:50px 0 36px;
+    border-top:1px solid var(--panel-line);
+  }
+  .footer-grid{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:20px;
+  }
+  .footer-logo{
+    font-family:'Oswald',sans-serif;
+    font-weight:600;
+    font-size:1rem;
+    letter-spacing:0.02em;
+  }
+  .footer-logo .accent{color:var(--venom);}
+  .footer-meta{
+    display:flex;
+    gap:28px;
+    font-size:0.82rem;
+    color:var(--ink-dim);
+    flex-wrap:wrap;
+  }
+  .footer-bottom{
+    margin-top:30px;
+    padding-top:22px;
+    border-top:1px solid var(--panel-line);
+    font-size:0.76rem;
+    color:var(--thread-dim);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 980px){
+    .hero-grid{grid-template-columns:1fr;}
+    .hero-visual{max-width:340px;margin:0 auto;order:-1;}
+    .services-grid{grid-template-columns:repeat(2,1fr);}
+    .trust-grid{grid-template-columns:repeat(2,1fr);gap:30px;}
+    .strip{grid-template-columns:repeat(2,1fr);}
+    .loc-grid{grid-template-columns:1fr;}
+    .form-wrap{grid-template-columns:1fr;}
+    .form-aside{border-right:none;border-bottom:1px solid var(--panel-line);}
+    .process-step{grid-template-columns:60px 1fr;}
+    .process-step .process-desc{grid-column:1/-1;}
+  }
+  @media (max-width: 640px){
+    .container{padding:0 20px;}
+    nav{padding:16px 20px;}
+    .nav-links{display:none;}
+    .services-grid{grid-template-columns:1fr;}
+    .trust-grid{grid-template-columns:1fr;}
+    .strip{grid-template-columns:repeat(2,1fr);}
+    .hero-stats{gap:22px;flex-wrap:wrap;}
+    .section-head{flex-direction:column;align-items:flex-start;}
+    .form-aside,.form-body{padding:38px 24px;}
+    section{padding:80px 0;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="thread-canvas"></canvas>
+<div class="noise"></div>
+
+<div class="wrap">
+
+  <header>
+    <nav>
+      <a href="#top" class="logo">
+        <svg class="logo-mark" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="3" fill="#e8423f"/>
+          <path d="M12 9V2M12 15v7M9 12H2M15 12h7M9.5 9.5L4 4M14.5 9.5L20 4M9.5 14.5L4 20M14.5 14.5L20 20" stroke="#9aa0a8" stroke-width="1"/>
+        </svg>
+        spider<span class="accent">DRIVER</span>
+      </a>
+      <div class="nav-links">
+        <a href="#services">Услуги</a>
+        <a href="#process">Процесс</a>
+        <a href="#work">Работы</a>
+        <a href="#location">Адрес</a>
+      </div>
+      <a href="#contact" class="nav-cta">Записаться</a>
+    </nav>
+  </header>
+
+  <main id="top">
+
+    <!-- ================= HERO ================= -->
+    <section class="hero" style="border-top:none;padding-top:60px;">
+      <div class="container">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow">Детейлинг-студия · Саянск</div>
+            <h1>Каждая нить<br>в идеальном<br><span class="line2">натяжении</span></h1>
+            <p class="hero-sub">spiderDRIVER — это точная, въедливая работа с кузовом и салоном: химчистка, полировка, керамика и защита, после которых машина выглядит так, будто только сошла с конвейера.</p>
+            <div class="hero-actions">
+              <a href="#contact" class="btn-primary">
+                Оставить заявку
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </a>
+              <a href="#services" class="btn-ghost">Смотреть услуги</a>
+            </div>
+            <div class="hero-stats">
+              <div>
+                <div class="stat-num">600+</div>
+                <div class="stat-label">обработанных автомобилей</div>
+              </div>
+              <div>
+                <div class="stat-num">7</div>
+                <div class="stat-label">этапов контроля качества</div>
+              </div>
+              <div>
+                <div class="stat-num">24 мес</div>
+                <div class="stat-label">гарантия на керамику</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-visual">
+            <svg class="web-rig" viewBox="0 0 320 340" fill="none">
+              <defs>
+                <radialGradient id="g1" cx="50%" cy="38%" r="65%">
+                  <stop offset="0%" stop-color="#1c1c20"/>
+                  <stop offset="100%" stop-color="#0a0a0b"/>
+                </radialGradient>
+              </defs>
+              <rect x="0" y="0" width="320" height="340" fill="url(#g1)" rx="2"/>
+              <!-- radial web -->
+              <g stroke="#3a3b3f" stroke-width="1">
+                <line x1="160" y1="40" x2="160" y2="300"/>
+                <line x1="40" y1="100" x2="280" y2="240"/>
+                <line x1="40" y1="240" x2="280" y2="100"/>
+                <line x1="70" y1="60" x2="250" y2="280"/>
+                <line x1="250" y1="60" x2="70" y2="280"/>
+              </g>
+              <g stroke="#52545a" stroke-width="1" fill="none">
+                <circle cx="160" cy="170" r="38"/>
+                <circle cx="160" cy="170" r="76"/>
+                <circle cx="160" cy="170" r="114"/>
+              </g>
+              <circle cx="160" cy="170" r="6" fill="#e8423f"/>
+              <circle cx="160" cy="170" r="11" fill="none" stroke="#e8423f" stroke-width="1" opacity="0.5"/>
+              <!-- droplets on threads -->
+              <circle cx="160" cy="94" r="2.5" fill="#c9a13a"/>
+              <circle cx="198" cy="208" r="2" fill="#c9a13a"/>
+              <circle cx="112" cy="132" r="2" fill="#c9a13a"/>
+              <circle cx="226" cy="132" r="2" fill="#9aa0a8"/>
+              <circle cx="98" cy="208" r="2" fill="#9aa0a8"/>
+            </svg>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SERVICES ================= -->
+    <section id="services">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="section-tag">Услуги</span>
+            <h2 class="section-title">Четыре уровня обработки — от мойки до полной защиты</h2>
+          </div>
+          <p class="section-note">Каждая услуга — самостоятельный модуль. Можно собрать пакет под бюджет и состояние машины.</p>
+        </div>
+
+        <div class="services-grid">
+          <div class="service-card">
+            <span class="service-num">01</span>
+            <h3>Химчистка салона</h3>
+            <p>Сухая и влажная чистка тканевых и кожаных поверхностей, удаление пятен и запахов, обработка пластика.</p>
+            <div class="service-price"><span>от</span><span>4 500 ₽</span></div>
+          </div>
+          <div class="service-card">
+            <span class="service-num">02</span>
+            <h3>Полировка кузова</h3>
+            <p>Удаление царапин, сколов и паутинки, восстановление глубины цвета и блеска лакокрасочного покрытия.</p>
+            <div class="service-price"><span>от</span><span>6 000 ₽</span></div>
+          </div>
+          <div class="service-card">
+            <span class="service-num">03</span>
+            <h3>Керамическое покрытие</h3>
+            <p>Защитный слой на кузов: грязеотталкивающий эффект, устойчивость к мелким повреждениям, насыщенный блеск.</p>
+            <div class="service-price"><span>от</span><span>15 000 ₽</span></div>
+          </div>
+          <div class="service-card">
+            <span class="service-num">04</span>
+            <h3>Антихром / бронепленка</h3>
+            <p>Защита кромок капота, бампера и порогов плёнкой от сколов камней и абразивных частиц на дороге.</p>
+            <div class="service-price"><span>от</span><span>8 000 ₽</span></div>
+          </div>
+          <div class="service-card">
+            <span class="service-num">05</span>
+            <h3>Чернение резины и пластика</h3>
+            <p>Восстановление цвета и защита от выгорания резиновых уплотнителей, пластиковых накладок и порогов.</p>
+            <div class="service-price"><span>от</span><span>2 000 ₽</span></div>
+          </div>
+          <div class="service-card">
+            <span class="service-num">06</span>
+            <h3>Комплекс «под ключ»</h3>
+            <p>Полный цикл: химчистка + полировка + защитное покрытие. Машина выходит в студийном состоянии.</p>
+            <div class="service-price"><span>от</span><span>22 000 ₽</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PROCESS ================= -->
+    <section id="process">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="section-tag">Процесс</span>
+            <h2 class="section-title">Как устроена работа над автомобилем</h2>
+          </div>
+          <p class="section-note">Прозрачный маршрут от заявки до выдачи — без скрытых этапов и сюрпризов в смете.</p>
+        </div>
+
+        <div class="process-rail">
+          <div class="process-step">
+            <div class="process-id">01</div>
+            <div class="process-name">Заявка и диагностика</div>
+            <div class="process-desc">Принимаем заявку через сайт или телеграм, согласовываем время, на месте оцениваем состояние кузова и салона.</div>
+          </div>
+          <div class="process-step">
+            <div class="process-id">02</div>
+            <div class="process-name">Подбор программы</div>
+            <div class="process-desc">Формируем состав работ и фиксируем стоимость до начала — без доплат за «дополнительную грязь».</div>
+          </div>
+          <div class="process-step">
+            <div class="process-id">03</div>
+            <div class="process-name">Обработка по этапам</div>
+            <div class="process-desc">Мойка → сушка → полировка/химчистка → защитное покрытие. Каждый этап фиксируется фотографией.</div>
+          </div>
+          <div class="process-step">
+            <div class="process-id">04</div>
+            <div class="process-name">Контроль и выдача</div>
+            <div class="process-desc">Финальный осмотр при дневном свете, рекомендации по уходу, выдача авто и гарантия на покрытие.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= WORK STRIP ================= -->
+    <section id="work">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="section-tag">Результат</span>
+            <h2 class="section-title">Фактура, которую видно в первом же отражении</h2>
+          </div>
+          <p class="section-note">Реальные фото работ появятся здесь — место уже подготовлено под вашу галерею.</p>
+        </div>
+        <div class="strip">
+          <div class="strip-cell"><div class="tex"></div><div class="glint"></div><div class="label">кузов / до-после</div></div>
+          <div class="strip-cell"><div class="tex"></div><div class="glint" style="top:55%;"></div><div class="label">салон</div></div>
+          <div class="strip-cell"><div class="tex"></div><div class="glint" style="top:20%;"></div><div class="label">керамика</div></div>
+          <div class="strip-cell"><div class="tex"></div><div class="glint" style="top:65%;"></div><div class="label">детали</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TRUST ================= -->
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="section-tag">Почему spiderDRIVER</span>
+            <h2 class="section-title">Детали, которые обычно остаются за кадром</h2>
+          </div>
+        </div>
+        <div class="trust-grid">
+          <div class="trust-item">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/></svg>
+            <h4>Фиксированная смета</h4>
+            <p>Стоимость согласовывается до начала работ и не меняется в процессе.</p>
+          </div>
+          <div class="trust-item">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            <h4>Соблюдение сроков</h4>
+            <p>Время выдачи озвучивается заранее и подтверждается на каждом этапе.</p>
+          </div>
+          <div class="trust-item">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M4 17l5-10 4 6 3-4 4 8H4z"/></svg>
+            <h4>Профессиональные составы</h4>
+            <p>Используем сертифицированную химию и материалы без агрессивных растворителей.</p>
+          </div>
+          <div class="trust-item">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <h4>Гарантия на покрытие</h4>
+            <p>Письменная гарантия на керамические и защитные составы — до 24 месяцев.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= LOCATION ================= -->
+    <section id="location">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="section-tag">Где мы находимся</span>
+            <h2 class="section-title">Студия в микрорайоне Юбилейный</h2>
+          </div>
+        </div>
+
+        <div class="loc-grid">
+          <div class="loc-info">
+            <div class="loc-row">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+              <div>
+                <div class="loc-label">Адрес</div>
+                <div class="loc-val">Иркутская область, г. Саянск,<br>мкр. Юбилейный, 31</div>
+              </div>
+            </div>
+            <div class="loc-row">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+              <div>
+                <div class="loc-label">Режим работы</div>
+                <div class="loc-val">Ежедневно — 9:00–20:00</div>
+              </div>
+            </div>
+            <div class="loc-row">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M21 16.5v2a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.8 19.8 0 011.12 2.18 2 2 0 013.11 0h2a2 2 0 012 1.72c.13 1 .36 1.99.68 2.94a2 2 0 01-.45 2.11L6.1 8c1.4 2.7 3.6 4.9 6.3 6.3l1.23-1.24a2 2 0 012.11-.45c.95.32 1.94.55 2.94.68A2 2 0 0121 16.5z"/></svg>
+              <div>
+                <div class="loc-label">Запись</div>
+                <div class="loc-val">Через форму ниже или в Telegram</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="map-frame">
+            <iframe
+              src="https://yandex.ru/map-widget/v1/?text=Иркутская%20область%2C%20Саянск%2C%20микрорайон%20Юбилейный%2C%2031&z=16"
+              loading="lazy"
+              allowfullscreen
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FORM ================= -->
+    <section id="contact" class="form-section">
+      <div class="container">
+        <div class="form-wrap">
+          <div class="form-aside">
+            <div>
+              <span class="section-tag">Запись на детейлинг</span>
+              <h2>Оставьте контакты —<br>вернёмся с деталями</h2>
+              <p>Заявка уходит напрямую в нашего телеграм-бота. Менеджер свяжется в Telegram, чтобы уточнить модель авто, услугу и удобное время.</p>
+            </div>
+            <div class="telegram-note">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M21 4L3 11.5l6 2.3L19 6l-9.5 9 .3 6 3-3.5L17.5 20 21 4z"/></svg>
+              <span>Укажите юзернейм в Telegram без ошибок — по нему бот напишет вам первым.</span>
+            </div>
+          </div>
+
+          <div class="form-body">
+            <form id="leadForm" novalidate>
+              <div class="field" id="field-name">
+                <label for="name">Имя <span class="req">*</span></label>
+                <input type="text" id="name" name="name" placeholder="Например, Алексей" autocomplete="name">
+                <div class="error-msg">Укажите, как к вам обращаться.</div>
+              </div>
+
+              <div class="field" id="field-phone">
+                <label for="phone">Номер телефона <span class="req">*</span></label>
+                <input type="tel" id="phone" name="phone" placeholder="+7 9XX XXX-XX-XX" autocomplete="tel">
+                <div class="error-msg">Введите номер в формате +7 9XX XXX-XX-XX.</div>
+              </div>
+
+              <div class="field" id="field-username">
+                <label for="username">Юзернейм в Telegram <span class="req">*</span></label>
+                <input type="text" id="username" name="username" placeholder="@username">
+                <div class="field-hint">Без него бот не сможет написать вам первым.</div>
+                <div class="error-msg">Юзернейм должен начинаться с @ и содержать от 5 символов.</div>
+              </div>
+
+              <button type="submit" class="form-submit" id="submitBtn">Отправить заявку</button>
+              <div class="form-status" id="formStatus"></div>
+
+              <p class="consent">Отправляя форму, вы соглашаетесь на обработку контактных данных для связи по вашей заявке.</p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-logo">spider<span class="accent">DRIVER</span></div>
+        <div class="footer-meta">
+          <span>Иркутская область, Саянск, мкр. Юбилейный, 31</span>
+          <span>Ежедневно 9:00–20:00</span>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 spiderDRIVER. Детейлинг-студия.</span>
+        <span>Сделано с вниманием к деталям.</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  /* ---------- THREAD CANVAS ANIMATION ---------- */
+  (function(){
+    const canvas = document.getElementById('thread-canvas');
+    const ctx = canvas.getContext('2d');
+    let w, h, nodes = [];
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function resize(){
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = Math.min(window.innerHeight * 1.4, document.body.scrollHeight);
+    }
+
+    function initNodes(){
+      nodes = [];
+      const count = Math.max(14, Math.floor(w / 130));
+      for(let i=0;i<count;i++){
+        nodes.push({
+          x: Math.random()*w,
+          y: Math.random()*h,
+          vx: (Math.random()-0.5)*0.12,
+          vy: (Math.random()-0.5)*0.12
+        });
+      }
+    }
+
+    let mouse = {x: -9999, y: -9999};
+    window.addEventListener('mousemove', e=>{
+      mouse.x = e.clientX;
+      mouse.y = e.clientY + window.scrollY;
+    });
+
+    function step(){
+      ctx.clearRect(0,0,w,h);
+      ctx.strokeStyle = 'rgba(154,160,168,0.16)';
+      ctx.lineWidth = 1;
+
+      for(let i=0;i<nodes.length;i++){
+        const n = nodes[i];
+        if(!prefersReduced){
+          n.x += n.vx;
+          n.y += n.vy;
+          if(n.x<0||n.x>w) n.vx*=-1;
+          if(n.y<0||n.y>h) n.vy*=-1;
+        }
+        for(let j=i+1;j<nodes.length;j++){
+          const m = nodes[j];
+          const dx = n.x-m.x, dy = n.y-m.y;
+          const dist = Math.sqrt(dx*dx+dy*dy);
+          if(dist < 240){
+            ctx.globalAlpha = 1 - dist/240;
+            ctx.beginPath();
+            ctx.moveTo(n.x, n.y);
+            ctx.lineTo(m.x, m.y);
+            ctx.stroke();
+          }
+        }
+        // connect to mouse
+        const dxm = n.x-mouse.x, dym = n.y-mouse.y;
+        const distm = Math.sqrt(dxm*dxm+dym*dym);
+        if(distm < 220){
+          ctx.globalAlpha = (1-distm/220)*0.8;
+          ctx.strokeStyle = 'rgba(232,66,63,0.5)';
+          ctx.beginPath();
+          ctx.moveTo(n.x,n.y);
+          ctx.lineTo(mouse.x,mouse.y);
+          ctx.stroke();
+          ctx.strokeStyle = 'rgba(154,160,168,0.16)';
+        }
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(step);
+    }
+
+    resize();
+    initNodes();
+    window.addEventListener('resize', ()=>{ resize(); initNodes(); });
+    step();
+  })();
+
+  /* ---------- FORM SUBMIT ---------- */
+  (function(){
+    const WEBHOOK_URL = "https://webhook.nodul.ru/24252/dev/a4022bb3-f617-4ac2-834c-a4a3be1876be";
+    const form = document.getElementById('leadForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const status = document.getElementById('formStatus');
+
+    function setError(fieldId, show){
+      const field = document.getElementById(fieldId);
+      field.classList.toggle('has-error', show);
+    }
+
+    function validate(){
+      let valid = true;
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const username = document.getElementById('username').value.trim();
+
+      if(name.length < 2){ setError('field-name', true); valid = false; } else setError('field-name', false);
+
+      const phoneDigits = phone.replace(/[^\d]/g,'');
+      if(phoneDigits.length < 10){ setError('field-phone', true); valid = false; } else setError('field-phone', false);
+
+      if(!/^@[a-zA-Z0-9_]{4,}$/.test(username)){ setError('field-username', true); valid = false; } else setError('field-username', false);
+
+      return valid;
+    }
+
+    form.addEventListener('submit', async function(e){
+      e.preventDefault();
+      status.classList.remove('show','ok','err');
+
+      if(!validate()) return;
+
+      const payload = {
+        name: document.getElementById('name').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        telegram_username: document.getElementById('username').value.trim(),
+        source: "spiderdriver_site",
+        submitted_at: new Date().toISOString()
+      };
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Отправляем…';
+
+      try{
+        const res = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if(res.ok){
+          status.textContent = 'Заявка отправлена. Мы напишем вам в Telegram в ближайшее время.';
+          status.classList.add('show','ok');
+          form.reset();
+        } else {
+          throw new Error('Bad response: ' + res.status);
+        }
+      } catch(err){
+        status.textContent = 'Не удалось отправить заявку. Попробуйте ещё раз или напишите нам в Telegram напрямую.';
+        status.classList.add('show','err');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Отправить заявку';
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>
